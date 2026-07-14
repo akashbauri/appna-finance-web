@@ -1,0 +1,235 @@
+"""
+APPNA FINANCE - Brand Placeholder Generator Engine
+Filename: generate_logo.py
+Role: Senior Python Engineer
+Design Standard: High-Fidelity Geometry and Premium Gold/Black Palettes using Pillow
+"""
+
+import os
+import math
+from PIL import Image, ImageDraw, ImageFont
+
+
+# --- COLOR PALETTE DEFINITIONS ---
+COLOR_TRANSPARENT = (0, 0, 0, 0)
+COLOR_LUXURY_BLACK = (18, 19, 23, 255)
+COLOR_DEEP_BLACK = (10, 11, 13, 255)
+COLOR_GOLD_PRIMARY = (212, 175, 55, 255)   # #D4AF37
+COLOR_GOLD_ACCENT = (197, 160, 89, 255)    # #C5A059
+COLOR_GOLD_LIGHT = (243, 217, 137, 255)     # #F3D989
+COLOR_TEXT_WHITE = (255, 255, 255, 255)
+COLOR_TEXT_MUTED = (176, 176, 176, 255)
+
+
+def get_safe_font(font_size: int) -> ImageFont.ImageFont:
+    """
+    Attempts to load a clean luxury-styled serif or standard system font.
+    Safely falls back to default system font matrix if true type is missing.
+    """
+    font_options = ["times.ttf", "georgia.ttf", "arial.ttf", "LiberationSans-Regular.ttf"]
+    for font_name in font_options:
+        try:
+            return ImageFont.truetype(font_name, font_size)
+        except IOError:
+            continue
+    return ImageFont.load_default()
+
+
+def setup_directories() -> None:
+    """Explicitly ensures both core assets and nested team directories exist."""
+    os.makedirs("assets", exist_ok=True)
+    os.makedirs("assets/team", exist_ok=True)
+
+
+def draw_arc_text(
+    draw: ImageDraw.ImageDraw,
+    image: Image.Image,
+    text: str,
+    font: ImageFont.ImageFont,
+    radius: float,
+    color: tuple,
+    center: tuple,
+    start_angle_rad: float,
+    direction: int = 1
+) -> None:
+    """
+    Renders text character-by-character along a perfect polar coordinate circumference arc.
+    """
+    center_x, center_y = center
+    
+    # Pre-calculate individual character spacing profiles
+    char_widths = []
+    total_width = 0
+    for char in text:
+        bbox = draw.textbbox((0, 0), char, font=font)
+        w = bbox[2] - bbox[0] if (bbox[2] - bbox[0]) > 0 else font.size // 2
+        char_widths.append(w)
+        total_width += w
+
+    arc_length = total_width / radius
+    current_angle = start_angle_rad - (arc_length / 2) * direction
+
+    for i, char in enumerate(text):
+        char_w = char_widths[i]
+        angle_offset = (char_w / 2) / radius
+        current_angle += angle_offset * direction
+
+        # Polar projection math
+        x = center_x + radius * math.cos(current_angle)
+        y = center_y + radius * math.sin(current_angle)
+
+        # Draw glyph on isolated mask for relative perpendicular transformation matrix
+        char_pad = font.size * 2
+        char_img = Image.new("RGBA", (char_pad, char_pad), COLOR_TRANSPARENT)
+        char_draw = ImageDraw.Draw(char_img)
+        char_draw.text((char_pad // 4, char_pad // 4), char, fill=color, font=font)
+
+        # Convert rotation matrix to absolute angles
+        rot_deg = math.degrees(current_angle) + 90 if direction == 1 else math.degrees(current_angle) - 90
+        rotated_char = char_img.rotate(-rot_deg, resample=Image.BICUBIC, expand=1)
+
+        rc_w, rc_h = rotated_char.size
+        image.paste(
+            rotated_char,
+            (int(x - rc_w // 2), int(y - rc_h // 2)),
+            rotated_char
+        )
+        current_angle += angle_offset * direction
+
+
+def generate_logo() -> None:
+    """Generates the official high-resolution branding logo template file."""
+    size = (1500, 1500)
+    img = Image.new("RGBA", size, COLOR_TRANSPARENT)
+    draw = ImageDraw.Draw(img)
+    cx, cy = size[0] // 2, size[1] // 2
+
+    # Draw Outer Double Gold Ring Structure
+    draw.ellipse([cx - 720, cy - 720, cx + 720, cy + 720], outline=COLOR_GOLD_PRIMARY, width=14)
+    draw.ellipse([cx - 690, cy - 690, cx + 690, cy + 690], outline=COLOR_GOLD_ACCENT, width=6)
+
+    # Core Black Solid Inner Disk
+    draw.ellipse([cx - 660, cy - 660, cx + 660, cy + 660], fill=COLOR_DEEP_BLACK)
+
+    # Secondary Inner Accent Ring
+    draw.ellipse([cx - 500, cy - 500, cx + 500, cy + 500], outline=COLOR_GOLD_PRIMARY, width=4)
+
+    # High-End Centered Monogram Typography
+    font_mono = get_safe_font(380)
+    m_text = "AF"
+    m_bbox = draw.textbbox((0, 0), m_text, font=font_mono)
+    m_w, m_h = m_bbox[2] - m_bbox[0], m_bbox[3] - m_bbox[1]
+    draw.text((cx - m_w // 2, cy - m_h // 2 - 40), m_text, fill=COLOR_GOLD_LIGHT, font=font_mono)
+
+    # Curved Border Typography Configurations
+    font_top = get_safe_font(72)
+    font_bottom = get_safe_font(54)
+    
+    draw_arc_text(draw, img, "APPNA FINANCE", font_top, 580, COLOR_GOLD_LIGHT, (cx, cy), -math.pi / 2, direction=1)
+    draw_arc_text(draw, img, "LEARN  •  GROW  •  PROSPER", font_bottom, 590, COLOR_GOLD_ACCENT, (cx, cy), math.pi / 2, direction=-1)
+
+    img.save("assets/logo.png", "PNG", dpi=(300, 300))
+
+
+def generate_favicon() -> None:
+    """Generates the clean micro-optimized web header icon target."""
+    size = (256, 256)
+    img = Image.new("RGBA", size, COLOR_TRANSPARENT)
+    draw = ImageDraw.Draw(img)
+    cx, cy = size[0] // 2, size[1] // 2
+
+    # Premium Solid Base Layout
+    draw.ellipse([2, 2, size[0] - 3, size[1] - 3], fill=COLOR_GOLD_PRIMARY)
+    draw.ellipse([12, 12, size[0] - 13, size[1] - 13], fill=COLOR_DEEP_BLACK)
+
+    # Monogram Center Text
+    font_fav = get_safe_font(80)
+    f_text = "AF"
+    f_bbox = draw.textbbox((0, 0), f_text, font=font_fav)
+    f_w, f_h = f_bbox[2] - f_bbox[0], f_bbox[3] - f_bbox[1]
+    draw.text((cx - f_w // 2, cy - f_h // 2 - 8), f_text, fill=COLOR_GOLD_LIGHT, font=font_fav)
+
+    img.save("assets/favicon.png", "PNG", dpi=(300, 300))
+
+
+def generate_launcher_logo() -> None:
+    """Generates the ultra-clean desktop app icon layout profile asset."""
+    size = (1024, 1024)
+    img = Image.new("RGBA", size, COLOR_TRANSPARENT)
+    draw = ImageDraw.Draw(img)
+    cx, cy = size[0] // 2, size[1] // 2
+
+    # Solid Foundation Backing
+    draw.rectangle([0, 0, size[0], size[1]], fill=COLOR_DEEP_BLACK)
+    
+    # Decorative Circular Border Ring
+    draw.ellipse([80, 80, size[0] - 81, size[1] - 81], outline=COLOR_GOLD_PRIMARY, width=12)
+
+    # Large Vector Profile Typography Centerpiece
+    font_launch = get_safe_font(300)
+    l_text = "AF"
+    l_bbox = draw.textbbox((0, 0), l_text, font=font_launch)
+    l_w, l_h = l_bbox[2] - l_bbox[0], l_bbox[3] - l_bbox[1]
+    draw.text((cx - l_w // 2, cy - l_h // 2 - 30), l_text, fill=COLOR_GOLD_LIGHT, font=font_launch)
+
+    img.save("assets/launcher_logo.png", "PNG", dpi=(300, 300))
+
+
+def generate_hero_banner() -> None:
+    """Generates the premium dynamic glassmorphic-styled platform application hero banner."""
+    size = (1600, 600)
+    img = Image.new("RGBA", size, COLOR_TRANSPARENT)
+    draw = ImageDraw.Draw(img)
+
+    # Core Luxury Background Block fill
+    draw.rectangle([0, 0, size[0], size[1]], fill=COLOR_LUXURY_BLACK)
+
+    # Decorative Background Canvas Accents: Luxury Gold Gradient Vectors
+    for i in range(0, size[0], 45):
+        draw.line([i, 0, i + 300, size[1]], fill=(212, 175, 55, 12), width=1)
+
+    # Geometry Element Base: Simple Financial Growth Vector Graph
+    graph_points = [(100, 480), (350, 440), (600, 360), (850, 390), (1100, 240), (1350, 290), (1500, 140)]
+    draw.line(graph_points, fill=COLOR_GOLD_PRIMARY, width=6, joint="round")
+    
+    for pt in graph_points:
+        draw.ellipse([pt[0] - 8, pt[1] - 8, pt[0] + 8, pt[1] + 8], fill=COLOR_GOLD_LIGHT)
+
+    # Financial Growth Vector Arrow Head
+    draw.polygon([(1500, 110), (1470, 170), (1530, 170)], fill=COLOR_GOLD_LIGHT)
+
+    # Abstract Graphic Accents: Gold Coins Vectors
+    coin_centers = [(1100, 240), (600, 360), (1350, 290)]
+    for cc in coin_centers:
+        draw.ellipse([cc[0] - 20, cc[1] - 35, cc[0] + 20, cc[1] - 5], fill=COLOR_GOLD_ACCENT, outline=COLOR_GOLD_LIGHT, width=2)
+        draw.ellipse([cc[0] - 14, cc[1] - 30, cc[0] + 14, cc[1] - 10], fill=COLOR_GOLD_PRIMARY)
+
+    # Text Rendering Platform Block Layering (Left-Aligned Clean Layout)
+    font_main = get_safe_font(96)
+    font_sub = get_safe_font(38)
+    font_desc = get_safe_font(32)
+
+    draw.text((80, 160), "APPNA FINANCE", fill=COLOR_GOLD_LIGHT, font=font_main)
+    draw.text((85, 280), "Learn  •  Grow  •  Prosper", fill=COLOR_TEXT_WHITE, font=font_sub)
+    draw.text((85, 345), "AI Powered Financial Education Platform", fill=COLOR_TEXT_MUTED, font=font_desc)
+
+    img.save("assets/hero_banner.png", "PNG", dpi=(300, 300))
+
+
+if __name__ == "__main__":
+    print("🚀 Initializing APPNA FINANCE Asset Pipeline...")
+    setup_directories()
+    
+    print("🎨 Building Main Circular Emblem Vector -> assets/logo.png")
+    generate_logo()
+    
+    print("💎 Compiling Web Tab Navigation Element -> assets/favicon.png")
+    generate_favicon()
+    
+    print("📱 Transforming Launcher Native App Configuration -> assets/launcher_logo.png")
+    generate_launcher_logo()
+    
+    print("🖥️ Rendering High-End Glassmorphic Canvas Layout -> assets/hero_banner.png")
+    generate_hero_banner()
+    
+    print("✨ Core Asset Generation Engine Completed Successfully.")
