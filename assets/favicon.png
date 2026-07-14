@@ -1,0 +1,104 @@
+"""
+APPNA FINANCE - Premium Favicon Generator Engine
+Filename: generate_favicon.py
+Role: Senior Python Engineer
+Design Standard: High-Fidelity Geometry, AI Circuits, and Premium Gold Glow using Pillow
+"""
+
+import os
+import math
+from PIL import Image, ImageDraw, ImageFont, ImageFilter
+
+# --- COLOR PALETTE DEFINITIONS ---
+COLOR_TRANSPARENT = (0, 0, 0, 0)
+COLOR_DEEP_BLACK = (10, 11, 13, 255)
+COLOR_GOLD_PRIMARY = (212, 175, 55, 255)   # #D4AF37
+COLOR_GOLD_ACCENT = (197, 160, 89, 255)    # #C5A059
+COLOR_GOLD_LIGHT = (243, 217, 137, 255)     # #F3D989
+COLOR_GOLD_GLOW = (212, 175, 55, 45)       # Translucent for soft illumination
+
+def get_safe_font(font_size: int) -> ImageFont.ImageFont:
+    """Loads a high-end clean serif or sans serif system font."""
+    font_options = ["times.ttf", "georgia.ttf", "arial.ttf", "LiberationSans-Regular.ttf"]
+    for font_name in font_options:
+        try:
+            return ImageFont.truetype(font_name, font_size)
+        except IOError:
+            continue
+    return ImageFont.load_default()
+
+def create_premium_favicon() -> None:
+    """Generates the advanced minimal luxury favicon with integrated growth arrow and AI circuit lines."""
+    os.makedirs("assets", exist_ok=True)
+    
+    # Render at 4x resolution for perfect anti-aliased downsampling
+    scale = 4
+    base_size = 256
+    render_size = base_size * scale
+    cx, cy = render_size // 2, render_size // 2
+    
+    # 1. Base Layer for Glow Separation
+    img = Image.new("RGBA", (render_size, render_size), COLOR_TRANSPARENT)
+    draw = ImageDraw.Draw(img)
+    
+    # 2. Render Soft Gold Glow Pass
+    glow_layer = Image.new("RGBA", (render_size, render_size), COLOR_TRANSPARENT)
+    glow_draw = ImageDraw.Draw(glow_layer)
+    glow_draw.ellipse([cx - 460, cy - 460, cx + 460, cy + 460], fill=COLOR_GOLD_GLOW)
+    glow_layer = glow_layer.filter(ImageFilter.GaussianBlur(25))
+    img.paste(glow_layer, (0, 0), glow_layer)
+    
+    # 3. Core Black Circular Background
+    draw.ellipse([cx - 420, cy - 420, cx + 420, cy + 420], fill=COLOR_DEEP_BLACK)
+    
+    # 4. Double Metallic Gold Border Framework
+    draw.ellipse([cx - 410, cy - 410, cx + 410, cy + 410], outline=COLOR_GOLD_PRIMARY, width=16)
+    draw.ellipse([cx - 380, cy - 380, cx + 380, cy + 380], outline=COLOR_GOLD_ACCENT, width=6)
+    
+    # 5. Core "AF" Monogram Geometry Matrix
+    font_fav = get_safe_font(360)
+    f_text = "AF"
+    
+    # Calculate perfect textual baseline center layout bounding box coordinates
+    bbox = draw.textbbox((0, 0), f_text, font=font_fav)
+    tx = cx - (bbox[2] - bbox[0]) // 2
+    ty = cy - (bbox[3] - bbox[1]) // 2 - 25
+    
+    # Draw large background watermark/base typography
+    draw.text((tx, ty), f_text, fill=COLOR_GOLD_LIGHT, font=font_fav)
+    
+    # 6. Integrated Upward Financial Growth Arrow into the "F"
+    # Perfectly scales up coordinates to overlap precisely with the center crossbar of the F typography character
+    arrow_base_x = tx + 245
+    arrow_base_y = ty + 190
+    
+    draw.rectangle([arrow_base_x - 12, arrow_base_y - 60, arrow_base_x + 12, arrow_base_y + 40], fill=COLOR_GOLD_PRIMARY)
+    draw.polygon([
+        (arrow_base_x - 35, arrow_base_y - 50),
+        (arrow_base_x, arrow_base_y - 105),
+        (arrow_base_x + 35, arrow_base_y - 50)
+    ], fill=COLOR_GOLD_LIGHT)
+    
+    # 7. Thin Vector AI Circuit Line Traces
+    # Architectural trace coordinates around text bounding boundaries
+    circuit_paths = [
+        [(tx - 40, cy), (tx - 10, cy), (tx + 30, cy - 60)],
+        [(cx, ty - 20), (cx, ty + 15), (cx + 50, ty + 50)],
+        [(tx + 400, cy + 40), (tx + 430, cy + 40), (tx + 460, cy + 90)]
+    ]
+    for path in circuit_paths:
+        draw.line(path, fill=COLOR_GOLD_ACCENT, width=4)
+        # Add circuit terminal nodes / nodes dots
+        end_pt = path[-1]
+        draw.ellipse([end_pt[0] - 10, end_pt[1] - 10, end_pt[0] + 10, end_pt[1] + 10], fill=COLOR_GOLD_LIGHT)
+        
+    # 8. High-Fidelity Anti-Aliased Resampling
+    final_img = img.resize((base_size, base_size), resample=Image.Resampling.LANCZOS)
+    
+    # Save optimized luxury platform asset output mapping matrix profile data to local assets storage configuration folder
+    final_img.save("assets/favicon.png", "PNG", dpi=(300, 300))
+
+if __name__ == "__main__":
+    print("🎨 Generating Premium Luxury Favicon Asset...")
+    create_premium_favicon()
+    print("✨ Favicon asset built successfully at 'assets/favicon.png'.")
