@@ -6,17 +6,21 @@ Design Language: Luxury Black & Metallic Gold Glassmorphism (Mapped to styles/cu
 """
 
 import streamlit as st
+import os
 
 # --- PAGE CONFIGURATION ---
 st.set_page_config(
     page_title="About Us | APPNA FINANCE",
-    page_icon="🏢",
+    page_icon="assets/favicon.png",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
 # --- SIDEBAR CONFIGURATION ---
 with st.sidebar:
+    if os.path.exists("assets/logo.png"):
+        st.image("assets/logo.png", width=170)
+    
     st.markdown("### APPNA FINANCE")
     st.markdown("🏢 **About Page**")
     st.markdown("---")
@@ -66,12 +70,16 @@ with hero_btn_cols[2]:
 
 # --- Visual Divider (Hero Image Asset) ---
 st.markdown("<br/>", unsafe_allow_html=True)
-# Showing the target demographic learning finance on mobile
-st.image(
-    "image_agent_tag_796912262390890361",
-    use_container_width=True,
-    caption="Empowering rural and urban communities with simple, accessible digital finance education."
-)
+
+hero_banner = "assets/hero_banner.png"
+if os.path.exists(hero_banner):
+    st.image(
+        hero_banner,
+        use_container_width=True,
+        caption="Empowering rural and urban communities with simple, accessible digital finance education."
+    )
+else:
+    st.warning("Hero banner not found.")
 
 
 # --- 2. OUR MISSION ---
@@ -258,29 +266,41 @@ st.markdown(
 st.markdown("---")
 st.markdown("### 👨‍💻 Founder Profile")
 
-# Updated Title to 'Founder, CEO & Founding AI Engineer' for consistency
-st.markdown(
-    """
-    <div class="premium-card" style="border: 1px solid rgba(212, 175, 55, 0.25); background: rgba(26, 29, 36, 0.95);">
-        <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: center;">
-            <div style="background: rgba(212, 175, 55, 0.1); width: 100px; height: 100px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #D4AF37; font-size: 2.5rem;">
-                👨‍💻
-            </div>
-            <div style="flex: 1; min-width: 250px;">
+# Layout integration for real founder spotlight image safely aligned with details
+spotlight_cols = st.columns([1, 3])
+
+with spotlight_cols[0]:
+    founder_img_path = "assets/team/akash_bauri.png"
+    if os.path.exists(founder_img_path):
+        st.image(founder_img_path, width=280)
+    else:
+        st.warning("Image not found")
+
+with spotlight_cols[1]:
+    st.markdown(
+        """
+        <div class="premium-card" style="border: 1px solid rgba(212, 175, 55, 0.25); background: rgba(26, 29, 36, 0.95); height: 100%; display: flex; flex-direction: column; justify-content: center;">
+            <div>
                 <h3 style="color: #D4AF37; margin: 0; font-size: 1.6rem;">Akash Bauri</h3>
                 <p style="color: #FFFFFF; font-weight: 500; margin: 0.25rem 0 0 0;">Founder, CEO & Founding AI Engineer</p>
-                <p style="color: #808080; font-size: 0.85rem; margin: 0.1rem 0 0 0;">APPNA FINANCE</p>
+                <p style="color: #D4AF37; font-size: 0.95rem; font-weight: 500; margin: 0.15rem 0 0 0; letter-spacing: 0.02em;">AI Researcher | Product Architect</p>
+                <p style="color: #808080; font-size: 0.85rem; margin: 0.25rem 0 0 0;">APPNA FINANCE</p>
                 <p style="color: #B0B0B0; font-size: 0.92rem; line-height: 1.5; margin-top: 0.75rem;">
-                    Akash Bauri is an artificial intelligence engineer and founder dedicated to simplifying complex financial concepts. 
-                    His vision is to utilize easy-to-use software technologies so that every Indian citizen can access simple, transparent, and 
-                    practical financial education.
+                    Akash Bauri is the Founder, Chief Executive Officer (CEO), and Founding AI Engineer of APPNA FINANCE. Akash Bauri is an AI Engineer, entrepreneur, and product builder dedicated to transforming financial education through Artificial Intelligence. His work combines Generative AI, Large Language Models, Machine Learning, Retrieval-Augmented Generation (RAG), and intelligent automation to make financial knowledge simple, trustworthy, and accessible for every Indian.
+                    <br/><br/>
+                    He has hands-on experience in Artificial Intelligence, Machine Learning, Generative AI, Large Language Models (LLMs), Retrieval-Augmented Generation (RAG), AI Agents, Prompt Engineering, Automation, and Intelligent Financial Systems.
+                    <br/><br/>
+                    His vision is to bridge the financial knowledge gap in India by helping students, farmers, working professionals, entrepreneurs, first-time investors, and families understand banking, investments, stock markets, personal finance, insurance, taxation, and government financial schemes through AI-powered education.
+                    <br/><br/>
+                    Under his leadership, APPNA FINANCE is being developed as a multilingual AI-powered financial education platform supporting English, Hindi, and Bengali, making financial knowledge accessible to users from both urban and rural communities.
+                    <br/><br/>
+                    His long-term mission is to build one of India's most trusted AI-powered financial education platforms while contributing to financial literacy, financial inclusion, and responsible financial decision-making across the country.
                 </p>
             </div>
         </div>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+        """,
+        unsafe_allow_html=True
+    )
 
 st.markdown("<br/>", unsafe_allow_html=True)
 social_cols = st.columns([1, 1, 1, 1])
@@ -302,22 +322,39 @@ st.markdown("### 👥 The Founding Team")
 team_cols = st.columns(3)
 
 team_members = [
-    ("Akash Bauri", "CEO & Founding AI Engineer", "Building core conversational algorithms, prompt architectures, and platform infrastructure."),
-    ("Jyoti Bouri", "Operations & Business Support", "Managing day-to-day coordination, strategic content creation, and partner relationships."),
-    ("Shanmugapriya Subramani", "Lead Frontend Engineer", "Designing fast, responsive Streamlit panels and mapping smooth user interfaces.")
+    {
+        "name": "Akash Bauri",
+        "role": "Founder, CEO & Founding AI Engineer",
+        "desc": "Responsible for the overall vision, AI architecture, product strategy, research, backend system design, RAG pipeline, AI agent development, machine learning integration, prompt engineering, and long-term technology roadmap of APPNA FINANCE.",
+        "img": "assets/team/akash_bauri.png"
+    },
+    {
+        "name": "Jyoti Bouri",
+        "role": "Co-Founder | Operations & Business Support",
+        "desc": "Supports business operations, customer relationship management, accounting coordination, financial documentation, administrative planning, partnership support, and organizational growth while helping build a reliable and customer-focused financial education platform.",
+        "img": "assets/team/jyoti_bouri.jpg"
+    },
+    {
+        "name": "Shanmugapriya Subramani",
+        "role": "Lead Frontend Engineer",
+        "desc": "Leads frontend architecture and user experience design by developing modern, responsive, and scalable interfaces. Responsible for implementing premium UI components, improving usability, maintaining design consistency, and delivering a seamless learning experience across the APPNA FINANCE platform.",
+        "img": "assets/team/shanmugapriya_subramani.png"
+    }
 ]
 
-for idx, (name, role, desc) in enumerate(team_members):
+for idx, member in enumerate(team_members):
     with team_cols[idx]:
+        if os.path.exists(member["img"]):
+            st.image(member["img"], width=80)
+        else:
+            st.warning("Image not found")
+            
         st.markdown(
             f"""
-            <div class="grid-card" style="min-height: 180px;">
-                <div style="background: rgba(212, 175, 55, 0.1); width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #D4AF37; font-size: 1.25rem; margin-bottom: 0.75rem;">
-                    👤
-                </div>
-                <div style="color: #FFFFFF; font-size: 1.15rem; font-weight: bold;">{name}</div>
-                <div style="color: #D4AF37; font-size: 0.85rem; font-weight: 500; margin-top: 0.15rem;">{role}</div>
-                <div style="color: #808080; font-size: 0.82rem; margin-top: 0.5rem; line-height: 1.4;">{desc}</div>
+            <div class="grid-card" style="min-height: 300px;">
+                <div style="color: #FFFFFF; font-size: 1.15rem; font-weight: bold; margin-top: 0.5rem;">{member['name']}</div>
+                <div style="color: #D4AF37; font-size: 0.85rem; font-weight: 500; margin-top: 0.15rem;">{member['role']}</div>
+                <div style="color: #808080; font-size: 0.82rem; margin-top: 0.5rem; line-height: 1.4;">{member['desc']}</div>
             </div>
             """,
             unsafe_allow_html=True
