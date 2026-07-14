@@ -1,0 +1,195 @@
+"""
+APPNA FINANCE - Premium Hero Banner Generator Engine
+Filename: generate_hero_banner.py
+Role: Senior Python Engineer
+Design Standard: High-Fidelity Geometry, Glassmorphism, and FinTech Vectors via Pillow
+"""
+
+import os
+import math
+from PIL import Image, ImageDraw, ImageFont, ImageFilter
+
+# --- COLOR PALETTE DEFINITIONS ---
+COLOR_TRANSPARENT = (0, 0, 0, 0)
+COLOR_MATTE_BLACK = (15, 16, 19, 255)
+COLOR_GOLD_PRIMARY = (212, 175, 55, 255)   # #D4AF37
+COLOR_GOLD_ACCENT = (197, 160, 89, 255)    # #C5A059
+COLOR_GOLD_LIGHT = (243, 217, 137, 255)     # #F3D989
+COLOR_GOLD_GLOW = (212, 175, 55, 20)       # Ultra-subtle gold backdrop glow
+COLOR_GOLD_SHIELD = (197, 160, 89, 40)     # Translucent shield interior fill
+COLOR_GLASS_FILL = (30, 32, 38, 90)        # Glassmorphic panel background block
+COLOR_GLASS_BORDER = (212, 175, 55, 45)    # Glassmorphic edge highlight ring
+COLOR_TEXT_WHITE = (255, 255, 255, 255)
+COLOR_TEXT_MUTED = (160, 163, 175, 255)
+COLOR_GRID_LINE = (212, 175, 55, 15)       # Faint gold financial network matrix
+
+
+def get_safe_font(font_size: int) -> ImageFont.ImageFont:
+    """
+    Attempts to load a clean luxury-styled serif or standard system font.
+    Safely falls back to default system font if true type layout engine is missing.
+    """
+    font_options = ["times.ttf", "georgia.ttf", "arial.ttf", "LiberationSans-Regular.ttf"]
+    for font_name in font_options:
+        try:
+            return ImageFont.truetype(font_name, font_size)
+        except IOError:
+            continue
+    return ImageFont.load_default()
+
+
+def setup_directories() -> None:
+    """Explicitly ensures the target asset directory structure exists."""
+    os.makedirs("assets", exist_ok=True)
+
+
+def draw_glow_circle(draw: ImageDraw.ImageDraw, cx: float, cy: float, radius: float, color: tuple) -> None:
+    """Draws a premium translucent concentric circle array to simulate a raw vector radial gradient."""
+    steps = 15
+    for i in range(steps):
+        current_rad = radius * (1 - (i / steps))
+        alpha = int(color[3] * (i / steps))
+        step_color = (color[0], color[1], color[2], alpha)
+        draw.ellipse([cx - current_rad, cy - current_rad, cx + current_rad, cy + current_rad], fill=step_color)
+
+
+def generate_hero_banner() -> None:
+    """Generates the advanced high-resolution production hero banner template asset."""
+    # Render at 4x internal resolution for perfect anti-aliased downsampling (6400 x 2400 px)
+    scale = 4
+    base_w, base_h = 1600, 600
+    rw, rh = base_w * scale, base_h * scale
+
+    # Initialize high-fidelity canvas layers
+    img = Image.new("RGBA", (rw, rh), COLOR_TRANSPARENT)
+    draw = ImageDraw.Draw(img)
+
+    # 1. BACKGROUND ENGINE PASSTHROUGH
+    # Base fill block
+    draw.rectangle([0, 0, rw, rh], fill=COLOR_MATTE_BLACK)
+
+    # Diagonal Gold Gradient Lines Matrix
+    for i in range(-rh, rw, 60 * scale):
+        draw.line([i, 0, i + rh, rh], fill=(212, 175, 55, 8), width=1 * scale)
+
+    # Faint Financial Network Grid Setup
+    grid_spacing = 80 * scale
+    for x in range(0, rw, grid_spacing):
+        draw.line([x, 0, x, rh], fill=COLOR_GRID_LINE, width=1 * scale)
+    for y in range(0, rh, grid_spacing):
+        draw.line([0, y, rw, y], fill=COLOR_GRID_LINE, width=1 * scale)
+
+    # Soft Ambient Gold Circular Vector Glows
+    draw_glow_circle(draw, rw * 0.2, rh * 0.5, 350 * scale, COLOR_GOLD_GLOW)
+    draw_glow_circle(draw, rw * 0.8, rh * 0.5, 400 * scale, COLOR_GOLD_GLOW)
+
+    # Right Background Vector Glassmorphism Base Panel Layer
+    panel_box = [rw * 0.53, rh * 0.12, rw * 0.95, rh * 0.88]
+    draw.rounded_rectangle(panel_box, radius=24 * scale, fill=COLOR_GLASS_FILL, outline=COLOR_GLASS_BORDER, width=2 * scale)
+
+    # 2. CENTER ZONE: Subtle Glowing Vertical Partition Divider
+    div_x = rw // 2
+    draw.line([div_x, rh * 0.15, div_x, rh * 0.85], fill=COLOR_GLASS_BORDER, width=2 * scale)
+    # Divider Core Focal Flare Line
+    draw.line([div_x, rh * 0.35, div_x, rh * 0.65], fill=COLOR_GOLD_LIGHT, width=2 * scale)
+
+    # 3. LEFT ZONE: Typographic Architectural Stack Layout
+    font_title = get_safe_font(84 * scale)
+    font_motto = get_safe_font(36 * scale)
+    font_platform = get_safe_font(26 * scale)
+
+    # Fixed typographic baseline margins
+    left_margin = 90 * scale
+    draw.text((left_margin, rh * 0.26), "APPNA FINANCE", fill=COLOR_GOLD_LIGHT, font=font_title)
+    draw.text((left_margin + (4 * scale), rh * 0.46), "Learn  •  Grow  •  Prosper", fill=COLOR_TEXT_WHITE, font=font_motto)
+    draw.text((left_margin + (4 * scale), rh * 0.57), "AI Powered Financial Education Platform", fill=COLOR_TEXT_MUTED, font=font_platform)
+
+    # 4. RIGHT ZONE: Premium Integrated FinTech Vector Illustration Mechanics
+    # Financial Analytics Bar Chart Matrix Array
+    bar_base_y = rh * 0.78
+    bar_widths = 36 * scale
+    bar_gap = 24 * scale
+    bar_x_start = rw * 0.58
+    bar_heights = [120 * scale, 180 * scale, 240 * scale, 320 * scale]
+
+    for idx, height in enumerate(bar_heights):
+        bx = bar_x_start + idx * (bar_widths + bar_gap)
+        # Translucent bar body profiles
+        draw.rectangle([bx, bar_base_y - height, bx + bar_widths, bar_base_y], fill=(197, 160, 89, 80))
+        # Solid primary accent cap caps
+        draw.rectangle([bx, bar_base_y - height, bx + bar_widths, bar_base_y - height + (6 * scale)], fill=COLOR_GOLD_LIGHT)
+
+    # Dynamic Upward Financial Growth Line Graph Trace Path
+    graph_points = [
+        (rw * 0.56, rh * 0.75),
+        (bar_x_start + (bar_widths // 2), bar_base_y - bar_heights[0] - (20 * scale)),
+        (bar_x_start + bar_widths + bar_gap + (bar_widths // 2), bar_base_y - bar_heights[1] - (30 * scale)),
+        (bar_x_start + 2 * (bar_widths + bar_gap) + (bar_widths // 2), bar_base_y - bar_heights[2] - (20 * scale)),
+        (bar_x_start + 3 * (bar_widths + bar_gap) + (bar_widths // 2), bar_base_y - bar_heights[3] - (40 * scale)),
+        (rw * 0.82, rh * 0.30)
+    ]
+    draw.line(graph_points, fill=COLOR_GOLD_PRIMARY, width=5 * scale, joint="round")
+    for pt in graph_points[:-1]:
+        draw.ellipse([pt[0] - (6 * scale), pt[1] - (6 * scale), pt[0] + (6 * scale), pt[1] + (6 * scale)], fill=COLOR_GOLD_LIGHT)
+
+    # Dynamic Vector Arrow Head Terminus Profile Configuration
+    arrow_tip = graph_points[-1]
+    draw.polygon([
+        (arrow_tip[0], arrow_tip[1] - (25 * scale)),
+        (arrow_tip[0] - (20 * scale), arrow_tip[1] + (15 * scale)),
+        (arrow_tip[0] + (20 * scale), arrow_tip[1] + (15 * scale))
+    ], fill=COLOR_GOLD_LIGHT)
+
+    # Security System Shield Graphic Vector Matrix Integration
+    sx, sy = rw * 0.88, rh * 0.64
+    sw, sh = 50 * scale, 60 * scale
+    shield_poly = [
+        (sx, sy - sh // 2), (sx + sw // 2, sy - sh // 3),
+        (sx + sw // 2, sy + sh // 6), (sx, sy + sh // 2),
+        (sx - sw // 2, sy + sh // 6), (sx - sw // 2, sy - sh // 3)
+    ]
+    draw.polygon(shield_poly, fill=COLOR_GOLD_SHIELD, outline=COLOR_GOLD_PRIMARY, width=3 * scale)
+    draw.line([(sx, sy - sh // 2), (sx, sy + sh // 2)], fill=COLOR_GOLD_PRIMARY, width=2 * scale)
+
+    # Banking Corporate Pillar Facility Building Graphics
+    bx, by = rw * 0.87, rh * 0.32
+    bw, bh = 110 * scale, 80 * scale
+    # Foundation base blocks
+    draw.rectangle([bx - bw // 2, by + bh // 2 - (8 * scale), bx + bw // 2, by + bh // 2], fill=COLOR_GOLD_PRIMARY)
+    # Architrave ceiling cornice triangle
+    draw.polygon([(bx, by - bh // 2), (bx - bw // 2 - (6 * scale), by - bh // 6), (bx + bw // 2 + (6 * scale), by - bh // 6)], fill=COLOR_GOLD_LIGHT)
+    # Vertical structure layout pillars
+    for p_offset in [-35 * scale, -12 * scale, 12 * scale, 35 * scale]:
+        draw.rectangle([bx + p_offset - (4 * scale), by - bh // 6, bx + p_offset + (4 * scale), by + bh // 2 - (8 * scale)], fill=COLOR_GOLD_ACCENT)
+
+    # Precision Luxury Currency Gold Coins Stack Structures
+    coin_x, coin_y = rw * 0.60, rh * 0.36
+    cr_w, cr_h = 45 * scale, 14 * scale
+    for c_idx in range(3):
+        cy_offset = coin_y + (c_idx * 12 * scale)
+        draw.ellipse([coin_x - cr_w, cy_offset - cr_h, coin_x + cr_w, cy_offset + cr_h], fill=COLOR_GOLD_ACCENT, outline=COLOR_GOLD_LIGHT, width=2 * scale)
+        draw.ellipse([coin_x - cr_w + (6 * scale), cy_offset - cr_h + (3 * scale), coin_x + cr_w - (6 * scale), cy_offset + cr_h - (3 * scale)], fill=COLOR_GOLD_PRIMARY)
+
+    # Network Intelligence AI Node Circuits Layer
+    circuit_nodes = [
+        (rw * 0.74, rh * 0.22),
+        (rw * 0.79, rh * 0.26),
+        (rw * 0.68, rh * 0.44)
+    ]
+    draw.line([circuit_nodes[0], circuit_nodes[1], (rw * 0.82, rh * 0.26)], fill=COLOR_GOLD_ACCENT, width=2 * scale)
+    draw.line([circuit_nodes[2], (rw * 0.68, rh * 0.54)], fill=COLOR_GOLD_ACCENT, width=2 * scale)
+    for n_pt in circuit_nodes:
+        draw.ellipse([n_pt[0] - (8 * scale), n_pt[1] - (8 * scale), n_pt[0] + (8 * scale), n_pt[1] + (8 * scale)], fill=COLOR_GOLD_LIGHT)
+
+    # 5. DOWNSAMPLING RESOLUTION CONVERSION MATRIX
+    final_banner = img.resize((base_w, base_h), resample=Image.Resampling.LANCZOS)
+
+    # Secure asset distribution compile write
+    final_banner.save("assets/hero_banner.png", "PNG", dpi=(300, 300))
+
+
+if __name__ == "__main__":
+    print("🚀 Generating Hero Banner...")
+    setup_directories()
+    generate_hero_banner()
+    print("✅ assets/hero_banner.png created successfully")
