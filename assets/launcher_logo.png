@@ -1,0 +1,148 @@
+"""
+APPNA FINANCE - Premium Launcher Logo Generator Engine
+Filename: generate_launcher_logo.py
+Role: Senior Python Engineer
+Design Standard: High-Fidelity Geometry, AI Circuits, and Premium Gold Glow using Pillow
+"""
+
+import os
+import math
+from PIL import Image, ImageDraw, ImageFont, ImageFilter
+
+# --- COLOR PALETTE DEFINITIONS ---
+COLOR_TRANSPARENT = (0, 0, 0, 0)
+COLOR_MATTE_BLACK = (15, 16, 19, 255)
+COLOR_GOLD_PRIMARY = (212, 175, 55, 255)   # #D4AF37
+COLOR_GOLD_ACCENT = (197, 160, 89, 255)    # #C5A059
+COLOR_GOLD_LIGHT = (243, 217, 137, 255)     # #F3D989
+COLOR_GOLD_GLOW = (212, 175, 55, 35)       # Soft translucent gold glow
+
+
+def get_safe_font(font_size: int) -> ImageFont.ImageFont:
+    """
+    Attempts to load a clean luxury-styled serif or standard system font.
+    Safely falls back to default system font if true type is missing.
+    """
+    font_options = ["times.ttf", "georgia.ttf", "arial.ttf", "LiberationSans-Regular.ttf"]
+    for font_name in font_options:
+        try:
+            return ImageFont.truetype(font_name, font_size)
+        except IOError:
+            continue
+    return ImageFont.load_default()
+
+
+def setup_directories() -> None:
+    """Explicitly ensures the target asset directory structure exists."""
+    os.makedirs("assets", exist_ok=True)
+
+
+def generate_launcher_logo() -> None:
+    """Generates the advanced high-resolution launcher logo with integrated geometry."""
+    # Render at 4x resolution for perfect anti-aliased downsampling (4096 x 4096 px)
+    scale = 4
+    base_size = 1024
+    render_size = base_size * scale
+    cx, cy = render_size // 2, render_size // 2
+
+    # Initialize high-fidelity canvas layers
+    img = Image.new("RGBA", (render_size, render_size), COLOR_TRANSPARENT)
+    draw = ImageDraw.Draw(img)
+
+    # 1. Background Fill (Rich Matte Black Canvas)
+    draw.rectangle([0, 0, render_size, render_size], fill=COLOR_MATTE_BLACK)
+
+    # 2. Double Metallic Gold Circular Border Framework
+    # Outer Border (12px native * 4 scale = 48px width)
+    outer_offset = 60 * scale
+    draw.ellipse(
+        [outer_offset, outer_offset, render_size - outer_offset, render_size - outer_offset],
+        outline=COLOR_GOLD_PRIMARY,
+        width=12 * scale
+    )
+    
+    # Inner Border (6px native * 4 scale = 24px width)
+    inner_offset = 85 * scale
+    draw.ellipse(
+        [inner_offset, inner_offset, render_size - inner_offset, render_size - inner_offset],
+        outline=COLOR_GOLD_ACCENT,
+        width=6 * scale
+    )
+
+    # 3. Soft Gold Glow Pass (Rendered on isolated overlay mask)
+    glow_layer = Image.new("RGBA", (render_size, render_size), COLOR_TRANSPARENT)
+    glow_draw = ImageDraw.Draw(glow_layer)
+    glow_draw.ellipse(
+        [cx - 400 * scale, cy - 400 * scale, cx + 400 * scale, cy + 400 * scale],
+        fill=COLOR_GOLD_GLOW
+    )
+    # Apply deep Gaussian filter pass to soften illumination profile
+    glow_layer = glow_layer.filter(ImageFilter.GaussianBlur(30 * scale))
+    img.paste(glow_layer, (0, 0), glow_layer)
+
+    # 4. Core Typography "AF" Monogram Coordinates
+    font_size = 320 * scale
+    font = get_safe_font(font_size)
+    monogram_text = "AF"
+    
+    # Calculate exact bounding configurations for strict geometrical center balance
+    bbox = draw.textbbox((0, 0), monogram_text, font=font)
+    tx = cx - (bbox[2] - bbox[0]) // 2
+    ty = cy - (bbox[3] - bbox[1]) // 2 - (30 * scale)
+    
+    # Render base Monogram onto canvas
+    draw.text((tx, ty), monogram_text, fill=COLOR_GOLD_LIGHT, font=font)
+
+    # 5. Integrated Financial Growth Arrow
+    # Aligned directly onto the spatial crossbar structure of the "F" component
+    arrow_center_x = tx + (455 * scale)
+    arrow_center_y = ty + (195 * scale)
+    
+    # Draw solid arrow shaft vector
+    draw.rectangle(
+        [arrow_center_x - (12 * scale), arrow_center_y - (65 * scale), 
+         arrow_center_x + (12 * scale), arrow_center_y + (50 * scale)],
+        fill=COLOR_GOLD_PRIMARY
+    )
+    
+    # Draw modern geometric arrow head
+    draw.polygon([
+        (arrow_center_x - (38 * scale), arrow_center_y - (55 * scale)),
+        (arrow_center_x, arrow_center_y - (120 * scale)),
+        (arrow_center_x + (38 * scale), arrow_center_y - (55 * scale))
+    ], fill=COLOR_GOLD_LIGHT)
+
+    # 6. Technical AI Circuit Lines and Nodes Layout Trace Matrix
+    # Subtle elegant vectors designed around outer textual geometry parameters
+    circuit_paths = [
+        # Left Upper Branch Traces
+        [(tx - (60 * scale), cy - (80 * scale)), (tx - (20 * scale), cy - (80 * scale)), (tx + (40 * scale), cy - (140 * scale))],
+        # Center Vertical Dynamic Core Node Traces
+        [(cx - (20 * scale), ty - (40 * scale)), (cx - (20 * scale), ty + (10 * scale)), (cx + (30 * scale), ty + (60 * scale))],
+        # Right Lower Terminus Flow Traces
+        [(tx + (520 * scale), cy + (60 * scale)), (tx + (560 * scale), cy + (60 * scale)), (tx + (600 * scale), cy + (120 * scale))]
+    ]
+    
+    for path in circuit_paths:
+        draw.line(path, fill=COLOR_GOLD_ACCENT, width=3 * scale)
+        
+        # Inject structural circular connection terminal nodes at all end points
+        end_node = path[-1]
+        node_radius = 8 * scale
+        draw.ellipse([
+            end_node[0] - node_radius, end_node[1] - node_radius,
+            end_node[0] + node_radius, end_node[1] + node_radius
+        ], fill=COLOR_GOLD_LIGHT)
+
+    # 7. High-Fidelity Anti-Aliased Lanczos Resampling Pass
+    final_logo = img.resize((base_size, base_size), resample=Image.Resampling.LANCZOS)
+
+    # Output highly optimized target premium image distribution asset package
+    final_logo.save("assets/launcher_logo.png", "PNG", dpi=(300, 300))
+
+
+if __name__ == "__main__":
+    print("🚀 Generating Launcher Logo...")
+    setup_directories()
+    generate_launcher_logo()
+    print("✅ assets/launcher_logo.png created successfully")
