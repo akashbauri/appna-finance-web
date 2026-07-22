@@ -59,7 +59,7 @@ def handle_send_message(user_query: str):
         response = requests.post(
             API_URL,
             json={
-                "query": user_query
+                "question": user_query
             },
             timeout=60
         )
@@ -69,13 +69,13 @@ def handle_send_message(user_query: str):
             data = response.json()
 
             ai_response = data.get(
-                "response",
+                "answer",
                 "No response received."
             )
 
         else:
 
-            ai_response = f"Backend Error : {response.status_code}"
+            ai_response = f"Backend Error: {response.status_code}\n\n{response.text}"
 
     except Exception as e:
 
