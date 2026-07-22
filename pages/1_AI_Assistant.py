@@ -6,7 +6,13 @@ Design Language: Luxury Black & Metallic Gold Glassmorphism (Mapped to styles/cu
 """
 
 import streamlit as st
+import requests
 import time
+
+# ==========================================
+# BACKEND CONFIGURATION
+# ==========================================
+API_URL = "https://agent-production-c6e4.up.railway.app/api/v1/chat"
 
 # --- PAGE CONFIGURATION ---
 st.set_page_config(
@@ -37,27 +43,51 @@ def initialize_session_state():
 
 
 def handle_send_message(user_query: str):
-    """Processes user queries, appends dummy responses, and manages history."""
+
     if not user_query.strip():
         return
 
-    # 1. Append User Message
-    st.session_state.chat_history.append({"role": "user", "message": user_query})
-
-    # 2. Append Dummy AI Response
-    # TODO: Replace dummy response with FastAPI endpoint.
-    # TODO: Connect Google Cloud AI backend.
-    # TODO: Connect chat history database (Supabase/ChromaDB).
-    dummy_ai_response = (
-        f"Thank you for using APPNA FINANCE.\n\n"
-        f"This is a frontend demonstration.\n\n"
-        f"Your question, *\"{user_query}\"*, has been received successfully.\n\n"
-        f"The Google Cloud AI backend will be connected in the next phase.\n\n"
-        f"Soon you'll receive AI-powered financial answers in English, Hindi, and Bengali."
+    st.session_state.chat_history.append(
+        {
+            "role": "user",
+            "message": user_query
+        }
     )
-    st.session_state.chat_history.append({"role": "ai", "message": dummy_ai_response})
-    
-    # Reset input text state
+
+    try:
+
+        response = requests.post(
+            API_URL,
+            json={
+                "query": user_query
+            },
+            timeout=60
+        )
+
+        if response.status_code == 200:
+
+            data = response.json()
+
+            ai_response = data.get(
+                "response",
+                "No response received."
+            )
+
+        else:
+
+            ai_response = f"Backend Error : {response.status_code}"
+
+    except Exception as e:
+
+        ai_response = f"Connection Error:\n\n{e}"
+
+    st.session_state.chat_history.append(
+        {
+            "role": "ai",
+            "message": ai_response
+        }
+    )
+
     st.session_state.chat_input_val = ""
 
 
@@ -73,18 +103,18 @@ with st.sidebar:
     
     # Technical Architecture Details (Reflecting target state)
     st.markdown("**System Architecture Overview**")
-    st.info("💡 Status: FRONTEND DEMO")
+    st.info("💡 Status: CONNECTED TO BACKEND")
     
     # Metadata Key-Values
     st.markdown(
         """
         | Component | Environment |
         | :--- | :--- |
-        | **Backend** | `Not Connected` |
+        | **Backend** | `Live (Railway)` |
         | **User Auth** | `Supabase (Future)` |
-        | **Gateway** | `FastAPI (Future)` |
-        | **LLM Engine** | `Google Cloud` |
-        | **LLM Orchestrator** | `Groq / Vertex AI` |
+        | **Gateway** | `FastAPI` |
+        | **LLM Engine** | `Qwen (Groq)` |
+        | **LLM Orchestrator** | `Groq Client` |
         | **Vector DB** | `ChromaDB (RAG)` |
         """
     )
@@ -109,11 +139,10 @@ st.markdown(
 st.markdown(
     """
     <div class="premium-card">
-        <h4 style="color: #D4AF37; margin-bottom: 0.5rem;">ℹ️ Technical Preview</h4>
+        <h4 style="color: #D4AF37; margin-bottom: 0.5rem;">ℹ️ Connected Assistant</h4>
         <p style="color: #FFFFFF; margin: 0; line-height: 1.6;">
             <strong>APPNA FINANCE AI Assistant</strong> helps users understand financial concepts in simple, jargon-free language. 
-            This interface simulates the complete system behavior. Seamless integration with our Google Cloud AI infrastructure, 
-            ChromaDB RAG vectors, and FastAPI endpoints will be established in the next deploy phase.
+            This interface is connected to our FastAPI backend running on Railway with Groq key management and multi-lingual AI support.
         </p>
     </div>
     """,
